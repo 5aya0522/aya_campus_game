@@ -1,0 +1,21 @@
+node_modules/
+dist/
+.DS_Store
+*.tar.gz
+.vercel/
+.netlify/
+.openai/
+.env
+.env.*
+!.env.example
+*.zip
+work/
+# 本机认证材料与玩家导出存档，禁止提交到公开仓库。
+*.pem
+*.key
+*.p12
+*.pfx
+.credentials/
+auth.json
+未命名-*.json
+存档-*.json
