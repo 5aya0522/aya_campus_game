@@ -1,0 +1,11 @@
+import{dispatch,fresh}from'./engine';import{validSnapshot}from'./snapshot';import{ids}from'./data/characters';import type{Action,GameState}from'./domain/types';
+export const AUTO='unnamed-between-auto-v2',MANUAL='unnamed-between-manual-v2';
+export function serialize(s:GameState){const {history,last,...snapshot}=s;return JSON.stringify({schemaVersion:2,storyVersion:'high-school-2026-v2',name:s.name,history,snapshot:{...snapshot,last:null}});}
+function validAction(a:unknown):a is Action{if(!a||typeof a!=='object')return false;const x=a as Record<string,unknown>;switch(x.type){case'continue':return true;case'express':return typeof x.text==='string'&&x.text.length<=600&&['story','chat','call'].includes(String(x.channel))&&(x.target===undefined||(ids.includes(x.target as never)&&x.target!=='aya'));case'read':return ids.includes(x.person as never)&&x.person!=='aya';case'like':case'inspect':return typeof x.post==='string'&&/^p-\d+$/.test(x.post);case'wallpaper':return['spring','night','blue'].includes(String(x.value));case'call':return ['answer','decline','end','outgoing'].includes(String(x.operation))&&(x.operation!=='outgoing'||(ids.includes(x.person as never)&&x.person!=='aya'))&&(x.duration===undefined||(typeof x.duration==='number'&&Number.isFinite(x.duration)&&x.duration>=0&&x.duration<=7200));case'music':return['play','pause','select','seek','shuffle','repeat'].includes(String(x.operation))&&(x.index===undefined||(Number.isInteger(x.index)&&Number(x.index)>=0&&Number(x.index)<=3))&&(x.position===undefined||(typeof x.position==='number'&&Number.isFinite(x.position)&&x.position>=0&&x.position<=10000));default:return false;}}
+export function parseSave(raw:string):GameState{
+if(raw.length>12000000)throw Error('存档过大');const data=JSON.parse(raw);
+if(data?.schemaVersion!==2||typeof data.name!=='string'||!data.name.trim()||data.name.length>16||!Array.isArray(data.history)||data.history.length>20000||!data.history.every(validAction))throw Error('不是有效的新版存档；旧版故事请使用备份版本');
+let s:GameState;
+if(data.snapshot!==undefined){if(!validSnapshot(data.snapshot)||data.snapshot.name!==data.name)throw Error('存档快照损坏');s={...data.snapshot,history:data.history,last:null};}
+else {s=fresh(data.name);for(const a of data.history)s=dispatch(s,a);}
+s.last=null;s.player.playing=false;return s;}

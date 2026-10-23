@@ -1,0 +1,8 @@
+node_modules
+.git
+.openai
+.DS_Store
+*.zip
+*.tar.gz
+work
+TESTING.md

@@ -1,0 +1,4 @@
+import{person}from'../data/characters';import type{PersonId}from'../domain/types';
+export function Avatar({id,large=false}:{id:PersonId;large?:boolean}){const p=person(id);return <span className={`avatar ${large?'large-avatar':''} ${id==='aya'?'aya-avatar':''}`} style={{background:p.color}} aria-label={p.name}>{p.initial}</span>}
+export function Landscape(){return <div className="landscape" role="img" aria-label="首尔瑞林高中，教学楼前的春日光线"><div className="sun"/><div className="mountain back"/><div className="mountain"/><div className="building b1"/><div className="building b2"/><div className="building b3"/><div className="tree t1"/><div className="tree t2"/><div className="wire"/><span className="scene-caption">SEORIM HIGH / SEOUL</span></div>}
+export const formatTime=(n:number)=>`${Math.floor(n/60)}:${String(Math.floor(n%60)).padStart(2,'0')}`;
